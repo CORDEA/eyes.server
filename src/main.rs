@@ -7,7 +7,7 @@ use std::env;
 
 use rocket::State;
 use rocket_contrib::json::Json;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use client::Client;
 use dotenv::dotenv;
@@ -22,9 +22,16 @@ pub struct LatLng {
     longitude: String,
 }
 
+#[derive(Serialize)]
+pub struct LatLngResponse {
+    name: String,
+}
+
 #[post("/latlng", data = "<latlng>")]
-fn latlng(client: State<Client>, latlng: Json<LatLng>) -> &'static str {
-    ""
+fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Json<LatLngResponse> {
+    Json(LatLngResponse {
+        name: "".to_string()
+    })
 }
 
 fn main() {
