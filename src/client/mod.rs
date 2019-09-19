@@ -7,7 +7,7 @@ mod response;
 const URL: &str = "https://maps.googleapis.com/maps/api/geocode/json";
 
 pub struct Client {
-    key: &'static str,
+    key: String,
 }
 
 impl Client {
@@ -24,6 +24,6 @@ impl Client {
     }
 }
 
-pub fn new_client(key: &'static str) -> Client {
+pub fn new_client(key: String) -> Client {
     Client { key }
 }

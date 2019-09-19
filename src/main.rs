@@ -39,6 +39,6 @@ fn main() {
     let api_key = env::var("API_KEY").expect("Failed to get API key");
     rocket::ignite()
         .mount("/", routes![latlng])
-        .manage(new_client(&api_key))
+        .manage(new_client(api_key))
         .launch();
 }
