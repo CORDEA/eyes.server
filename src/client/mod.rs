@@ -1,11 +1,12 @@
-mod response;
+use url::{ParseError, Url};
 
-use url::{Url, ParseError};
 use response::Response;
+
+mod response;
 
 const URL: &str = "https://maps.googleapis.com/maps/api/geocode/json";
 
-struct Client {
+pub struct Client {
     key: &'static str,
 }
 
@@ -21,4 +22,8 @@ impl Client {
         base.set_query(Some(&format!("key={}", &self.key)));
         Ok(base)
     }
+}
+
+pub fn new_client(key: &'static str) -> Client {
+    Client { key }
 }
