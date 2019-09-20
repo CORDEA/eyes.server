@@ -31,7 +31,7 @@ pub struct LatLngResponse {
 }
 
 #[post("/latlng", data = "<latlng>")]
-fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
+fn latlng(client: State<Client>, slack_client: State<slack::Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
     let response = client.request(&latlng.latitude, &latlng.longitude);
     match response {
         Ok(response) => {
@@ -39,8 +39,10 @@ fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResp
             match first {
                 None => Err(Status::InternalServerError),
                 Some(result) => {
+                    let format = formatter::format(&result.address_components);
+                    let _ = slack_client.request(&format);
                     Ok(Json(LatLngResponse {
-                        name: formatter::format(&result.address_components)
+                        name: format
                     }))
                 }
             }
@@ -55,8 +57,10 @@ fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResp
 fn main() {
     dotenv().ok();
     let api_key = env::var("API_KEY").expect("Failed to get API key");
+    let slack_api_key = env::var("SLACK_API_KEY").expect("Failed to get API key");
     rocket::ignite()
         .mount("/", routes![latlng])
         .manage(new_client(api_key))
+        .manage(slack::new_client(slack_api_key))
         .launch();
 }
