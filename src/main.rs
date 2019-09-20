@@ -16,6 +16,7 @@ use google::Client;
 use google::new_client;
 
 mod google;
+mod slack;
 mod formatter;
 
 #[derive(Deserialize)]
