@@ -32,26 +32,28 @@ pub struct LatLngResponse {
 
 #[post("/latlng", data = "<latlng>")]
 fn latlng(client: State<Client>, slack_client: State<slack::Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
-    let response = client.request(&latlng.latitude, &latlng.longitude);
-    match response {
-        Ok(response) => {
-            let first = response.results.first();
-            match first {
-                None => Err(Status::InternalServerError),
-                Some(result) => {
-                    let format = formatter::format(&result.address_components);
-                    let _ = slack_client.request(&format);
-                    Ok(Json(LatLngResponse {
-                        name: format
-                    }))
-                }
-            }
-        }
+    let response = match client.request(&latlng.latitude, &latlng.longitude) {
+        Ok(response) => response,
         Err(err) => {
             error!("{}", err);
-            Err(Status::InternalServerError)
+            return Err(Status::InternalServerError);
         }
+    };
+
+    let first = match response.results.first() {
+        Some(result) => result,
+        None => return Err(Status::InternalServerError)
+    };
+
+    let format = formatter::format(&result.address_components);
+    if let Err(err) = slack_client.request(&format) {
+        error!("{}", err);
+        return Err(Status::InternalServerError);
     }
+
+    Ok(Json(LatLngResponse {
+        name: format
+    }))
 }
 
 fn main() {
