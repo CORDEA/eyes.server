@@ -2,13 +2,13 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct Response {
-    results: Vec<Result>,
+    pub results: Vec<Result>,
 }
 
 #[derive(Deserialize)]
 pub struct Result {
     address_components: Vec<AddressComponent>,
-    formatted_address: String,
+    pub formatted_address: String,
     geometry: Geometry,
 }
 

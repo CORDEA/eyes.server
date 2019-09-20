@@ -5,6 +5,8 @@ extern crate rocket;
 
 use std::env;
 
+use log::error;
+use rocket::http::Status;
 use rocket::State;
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
@@ -28,10 +30,25 @@ pub struct LatLngResponse {
 }
 
 #[post("/latlng", data = "<latlng>")]
-fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Json<LatLngResponse> {
-    Json(LatLngResponse {
-        name: "".to_string()
-    })
+fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
+    let response = client.request(&latlng.latitude, &latlng.longitude);
+    match response {
+        Ok(response) => {
+            let first = response.results.first();
+            match first {
+                None => Err(Status::InternalServerError),
+                Some(result) => {
+                    Ok(Json(LatLngResponse {
+                        name: result.formatted_address.to_owned()
+                    }))
+                }
+            }
+        }
+        Err(err) => {
+            error!("{}", err);
+            Err(Status::InternalServerError)
+        }
+    }
 }
 
 fn main() {
