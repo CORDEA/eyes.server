@@ -12,8 +12,6 @@ use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
 use dotenv::dotenv;
-use google::Client;
-use google::new_client;
 
 mod google;
 mod slack;
@@ -31,8 +29,9 @@ pub struct LatLngResponse {
 }
 
 #[post("/latlng", data = "<latlng>")]
-fn latlng(client: State<Client>, slack_client: State<slack::Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
-    let response = match client.request(&latlng.latitude, &latlng.longitude) {
+fn latlng(google_client: State<google::Client>, slack_client: State<slack::Client>,
+          latlng: Json<LatLng>) -> Result<Json<LatLngResponse>, Status> {
+    let response = match google_client.request(&latlng.latitude, &latlng.longitude) {
         Ok(response) => response,
         Err(err) => {
             error!("{}", err);
@@ -40,7 +39,7 @@ fn latlng(client: State<Client>, slack_client: State<slack::Client>, latlng: Jso
         }
     };
 
-    let first = match response.results.first() {
+    let result = match response.results.first() {
         Some(result) => result,
         None => return Err(Status::InternalServerError)
     };
@@ -58,11 +57,11 @@ fn latlng(client: State<Client>, slack_client: State<slack::Client>, latlng: Jso
 
 fn main() {
     dotenv().ok();
-    let api_key = env::var("API_KEY").expect("Failed to get API key");
+    let google_api_key = env::var("GOOGLE_API_KEY").expect("Failed to get API key");
     let slack_api_key = env::var("SLACK_API_KEY").expect("Failed to get API key");
     rocket::ignite()
         .mount("/", routes![latlng])
-        .manage(new_client(api_key))
+        .manage(google::new_client(google_api_key))
         .manage(slack::new_client(slack_api_key))
         .launch();
 }
