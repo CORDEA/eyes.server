@@ -7,16 +7,16 @@ pub struct Response {
 
 #[derive(Deserialize)]
 pub struct Result {
-    address_components: Vec<AddressComponent>,
-    pub formatted_address: String,
+    pub address_components: Vec<AddressComponent>,
+    formatted_address: String,
     geometry: Geometry,
 }
 
 #[derive(Deserialize)]
 pub struct AddressComponent {
-    long_name: String,
+    pub long_name: String,
     short_name: String,
-    types: Vec<String>,
+    pub types: Vec<String>,
 }
 
 #[derive(Deserialize)]

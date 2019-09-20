@@ -2,7 +2,7 @@ use url::{ParseError, Url};
 
 use response::Response;
 
-mod response;
+pub mod response;
 
 const URL: &str = "https://maps.googleapis.com/maps/api/geocode/json";
 

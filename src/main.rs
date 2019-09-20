@@ -14,9 +14,10 @@ use serde::{Deserialize, Serialize};
 use client::Client;
 use dotenv::dotenv;
 
-use crate::client::new_client;
+use client::new_client;
 
 mod client;
+mod formatter;
 
 #[derive(Deserialize)]
 pub struct LatLng {
@@ -39,7 +40,7 @@ fn latlng(client: State<Client>, latlng: Json<LatLng>) -> Result<Json<LatLngResp
                 None => Err(Status::InternalServerError),
                 Some(result) => {
                     Ok(Json(LatLngResponse {
-                        name: result.formatted_address.to_owned()
+                        name: formatter::format(&result.address_components)
                     }))
                 }
             }
