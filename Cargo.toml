@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 url = "2.1.0"
+log = "0.4"
 reqwest = "0.9.20"
 rocket = "0.4.2"
 rocket_contrib = "0.4.2"
