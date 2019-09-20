@@ -24,7 +24,7 @@ impl Client {
         let profile = Request {
             profile: Profile {
                 status_text: text.to_owned(),
-                status_emoji: String::new(),
+                status_emoji: ":round_pushpin:".to_string(),
                 status_expiration: 0,
             }
         };
