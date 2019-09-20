@@ -11,15 +11,18 @@ pub struct Client {
 }
 
 impl Client {
-    fn request(&self, latitude: String, longitude: String) -> Result<Response, reqwest::Error> {
-        let url = &self.build_url(latitude, longitude).expect("Failed to parse url");
+    pub fn request(&self, latitude: &str, longitude: &str) -> Result<Response, reqwest::Error> {
+        let url = self.build_url(latitude, longitude).expect("Failed to parse url");
         reqwest::get(url.as_str())?.json()
     }
 
-    fn build_url(&self, latitude: String, longitude: String) -> Result<Url, ParseError> {
+    fn build_url(&self, latitude: &str, longitude: &str) -> Result<Url, ParseError> {
         let mut base = Url::parse(URL)?;
-        base.set_query(Some(&format!("latlng={},{}", latitude, longitude)));
-        base.set_query(Some(&format!("key={}", &self.key)));
+        {
+            let mut queries = base.query_pairs_mut();
+            queries.append_pair("latlng", &format!("{},{}", latitude, longitude));
+            queries.append_pair("key", &self.key);
+        }
         Ok(base)
     }
 }
