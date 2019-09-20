@@ -1,4 +1,4 @@
-use crate::client::response::AddressComponent;
+use crate::google::response::AddressComponent;
 
 pub fn format(addresses: &Vec<AddressComponent>) -> String {
     let mut result: String = String::new();

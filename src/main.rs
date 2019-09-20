@@ -11,12 +11,11 @@ use rocket::State;
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
-use client::Client;
 use dotenv::dotenv;
+use google::Client;
+use google::new_client;
 
-use client::new_client;
-
-mod client;
+mod google;
 mod formatter;
 
 #[derive(Deserialize)]
